@@ -5,10 +5,14 @@ import (
  "net/http"
  "time"
 
- "example/handler"
+ "github.com/lemrex/go1/handler"
 )
 
 func main() {
+ http.HandleFunc("/", handler.Welcome)
+ http.HandleFunc("/time", handler.Time)
+ http.HandleFunc("/date", handler.Date)  
+ http.HandleFunc("/day", handler.Day)     
  http.HandleFunc("/hello", handler.Hello)
  http.HandleFunc("/goodbye", handler.Goodbye)
 
