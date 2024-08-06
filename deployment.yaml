@@ -23,7 +23,9 @@ spec:
               memory: 100Mi 
             requests:
               cpu: 100m 
-              memory: 100Mi 
+              memory: 100Mi
+      imagePullSecrets:
+      - name: my-registry-secret         
 
 ---
 apiVersion: v1
