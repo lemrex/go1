@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-api
+  template:
+    metadata:
+      labels:
+        app: go-api
+    spec:
+      containers:
+        - name: dbs
+          image: swr.af-south-1.myhuaweicloud.com/ralf/go-api:8dc031913cc0c7712f244e98604a33acf22ebd43
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 100m 
+              memory: 100Mi 
+            requests:
+              cpu: 100m 
+              memory: 100Mi 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-api
+  labels:
+    app: go-api
+spec:
+  type: ClusterIP # Change to NodePort or LoadBalancer depending on requirement
+  selector:
+    app: go-api
+  ports:
+    - protocol: TCP
+      port: 80          # Port that the service will expose
+      targetPort: 8080  # Port on the container that the service should route traffic to

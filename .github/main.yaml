@@ -1,0 +1,62 @@
+name: CI/CD to Huawei SWR and CCE
+
+on:
+  push:
+    branches:
+      - main
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+
+    - name: Log in to Huawei Cloud SWR
+      id: build-image
+      uses: huaweicloud/swr-login@v2.1.0
+      with:
+        access-key-id: ${{ secrets.ACCESSKEY }}
+        access-key-secret: ${{ secrets.SECRETACCESSKEY }}
+        region: af-south-1     
+
+    - name: Build and push  image
+      run: |
+        docker build -t swr.af-south-1.myhuaweicloud.com/ralf/go-api:${{ github.sha }} .
+        docker push swr.af-south-1.myhuaweicloud.com/ralf/go-api:${{ github.sha }}
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure kubectl for Huawei Cloud CCE
+        run: |
+          sudo mkdir -p $HOME/.kube
+          sudo chown -R runner:runner $HOME/.kube
+          export KUBECONFIG=$HOME/.kube/config
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" > $KUBECONFIG
+      - name: Update deployment
+        run: |
+          sed -i "s@swr.af-south-1.myhuaweicloud.com/ralf/go-api:[a-z0-9]*@swr.af-south-1.myhuaweicloud.com/ralf/go-api:${{ github.sha }}@g" deployment.yaml   
+
+
+      - name: Debugging
+        run: |
+          kubectl version
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Deploy to Huawei CCE
+        run: |
+          kubectl apply -f deployment.yaml
