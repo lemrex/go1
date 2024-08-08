@@ -1,0 +1,45 @@
+name: CI/CD to Huawei SWR and CCE
+
+on:
+  push:
+    branches:
+      - main
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # outputs:
+    #   image: ${{ steps.build-image.outputs.image }}
+
+
+
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: whoami
+
+    # - name: Checkout code
+    #   uses: actions/checkout@v2
+
+
+    # - name: Log in to Huawei Cloud SWR
+    #   id: build-image
+    #   uses: huaweicloud/swr-login@v2.1.0
+    #   with:
+    #     access-key-id: ${{ secrets.ACCESSKEY }}
+    #     access-key-secret: ${{ secrets.SECRETACCESSKEY }}
+    #     region: af-south-1     
+
+    # - name: Build and push  image
+    #   run: |
+    #     docker build -t swr.af-south-1.myhuaweicloud.com/ralf/go-api:${{ github.sha }} .
+    #     docker push swr.af-south-1.myhuaweicloud.com/ralf/go-api:${{ github.sha }}
+
+
