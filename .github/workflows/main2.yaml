@@ -23,7 +23,14 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
-        script: ls -la  && whoami
+        # script: ls -la
+        script: |
+          echo "Running script 1"
+          ls -la
+          echo "done"
+          
+  
+          
 
     # - name: run shell command
     #   run: |
